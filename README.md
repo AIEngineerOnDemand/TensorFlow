@@ -122,7 +122,37 @@ In this example, the model's predictions are computed within the context of a tf
 In summary, model.fit() is a high-level, easy-to-use method for training a model, while tf.GradientTape() provides more control and is useful for more complex training loops. 
 
 
+## Understanding TensorFlow Metrics
 
+In TensorFlow, metrics are instances of the `tf.keras.metrics.Metric` class, which you can use to track the progress of your training and testing loops. Here's a brief explanation of the metrics used in this code:
+
+### `tf.keras.metrics.Mean`
+
+`tf.keras.metrics.Mean` computes the (weighted) mean of the given values. In this case, it's used to track the average loss during training and testing. The `name` argument is used to give the metric a name, which can be useful for logging.
+
+Here's how it's used:
+
+```python
+train_loss = tf.keras.metrics.Mean(name='train_loss')
+test_loss = tf.keras.metrics.Mean(name='test_loss')
+````
+
+In this example, `train_loss` and `test_loss` are metrics that compute the mean training and testing loss, respectively.
+
+### `tf.keras.metrics.SparseCategoricalAccuracy`
+
+`tf.keras.metrics.SparseCategoricalAccuracy` calculates how often predictions match integer labels. It's used to track the accuracy of the model during training and testing. The `name` argument is used to give the metric a name, which can be useful for logging.
+
+Here's how it's used:
+
+```python
+train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+```
+
+In this example, `train_accuracy` and `test_accuracy` are metrics that compute the mean training and testing accuracy, respectively.
+
+In summary, `tf.keras.metrics.Mean` and `tf.keras.metrics.SparseCategoricalAccuracy` are used to track the progress of the training and testing loops.
 
 
 ## Explanation of TensorFlow Training Step
@@ -143,6 +173,40 @@ def train_step(images, labels):
 
   train_loss(loss)
   train_accuracy(labels, predictions)
+
+@tf.function
+def test_step(images, labels):
+  # training=False is only needed if there are layers with different
+  # behavior during training versus inference (e.g. Dropout).
+  predictions = model(images, training=False)
+  t_loss = loss_object(labels, predictions)
+
+  test_loss(t_loss)
+  test_accuracy(labels, predictions)
+
+ EPOCHS = 5
+
+for epoch in range(EPOCHS):
+  # Reset the metrics at the start of the next epoch
+  train_loss.reset_state()
+  train_accuracy.reset_state()
+  test_loss.reset_state()
+  test_accuracy.reset_state()
+
+  for images, labels in train_ds:
+    train_step(images, labels)
+
+  for test_images, test_labels in test_ds:
+    test_step(test_images, test_labels)
+
+  print(
+    f'Epoch {epoch + 1}, '
+    f'Loss: {train_loss.result():0.2f}, '
+    f'Accuracy: {train_accuracy.result() * 100:0.2f}, '
+    f'Test Loss: {test_loss.result():0.2f}, '
+    f'Test Accuracy: {test_accuracy.result() * 100:0.2f}'
+  )
+         
 ``` 
 
 This decorator tells TensorFlow to compile the function using TensorFlow's graph mode, which can provide significant speedups.
