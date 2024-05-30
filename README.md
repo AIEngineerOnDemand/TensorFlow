@@ -27,7 +27,7 @@ class MyModel(Model):
 
 # Create an instance of the model
 model = MyModel()
-
+```
 ## Explanation of TensorFlow Training Step
 
 The `train_step` function is a single step in the training of a TensorFlow model. Here's what each part does:
@@ -35,17 +35,76 @@ The `train_step` function is a single step in the training of a TensorFlow model
 
 ```python
 @tf.function
-``` This decorator tells TensorFlow to compile the function using TensorFlow's graph mode, which can provide significant speedups.
+def train_step(images, labels):
+  with tf.GradientTape() as tape:
+    # training=True is only needed if there are layers with different
+    # behavior during training versus inference (e.g. Dropout).
+    predictions = model(images, training=True)
+    loss = loss_object(labels, predictions)
+  gradients = tape.gradient(loss, model.trainable_variables)
+  optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+  train_loss(loss)
+  train_accuracy(labels, predictions)
+``` 
+
+This decorator tells TensorFlow to compile the function using TensorFlow's graph mode, which can provide significant speedups.
+
+
+## Understanding Different Ways to Define Models in TensorFlow
+
+In TensorFlow, there are two common ways to define models: using the `Sequential` API, and using the Model subclassing. Here's a brief explanation of the differences:
+
+### `Sequential` API
+
+The `Sequential` API is a way of creating deep learning models where each layer has exactly one input tensor and one output tensor. It's a simple stack of layers that can't represent arbitrary models.
+
+`Sequential` models are created using the `Keras` API, which is included in TensorFlow. Here's an example:
+
+```python
+from tensorflow.keras import Sequential, layers
+
+model = Sequential([
+    layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1)
+])
+```
+
+In this example, the model is a simple stack of three dense layers. It's easy to understand and use, but it's not suitable for models with shared layers, multiple inputs, or multiple outputs.
+
+## Model Subclassing
+Model subclassing is a way of creating models that gives more flexibility, at the cost of greater complexity. It involves defining a new class that inherits from the Model class, and overriding the __init__ and call methods.
+
+Here's an example:
+
+```python
+from tensorflow.keras import Model, layers
+
+class MyModel(Model):
+    def __init__(self):
+        super(MyModel, self).__init__()
+        self.dense1 = layers.Dense(64, activation='relu')
+        self.dense2 = layers.Dense(32, activation='relu')
+        self.dense3 = layers.Dense(1)
+
+    def call(self, inputs, training=False):
+        x = self.dense1(inputs)
+        x = self.dense2(x)
+        return self.dense3(x)
+
+model = MyModel()
+````
 
 ## Difference Between `model.fit()` and `tf.GradientTape()` for Training
 
 In TensorFlow, there are multiple ways to train a model. Two common methods are using the `fit` method of a compiled model, and using a `tf.GradientTape` to manually compute gradients. Here's a brief explanation of the differences:
 
-### `model.fit()`
+## `model.fit()`
 
 `model.fit()` is a high-level method provided by Keras (which is included in TensorFlow). It abstracts away many of the details of training a model, making it very easy to use. 
 
-To use `model.fit()`, you first need to compile your model with a specified optimizer, loss function, and metrics. Then, you simply call `model.fit()` with your training data and labels, and Keras handles the rest.
+To use `model.fit()`  is a high-level method provided by Keras (which is included in TensorFlow). It abstracts away many of the details of training a model, making it very easy to use. You first need to compile your model with a specified optimizer, loss function, and metrics. Then, you simply call `model.fit()` with your training data and labels, and Keras handles the rest.
 
 Here's an example:
 
@@ -60,12 +119,12 @@ model = K.Sequential([
 model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
 
 model.fit(x_train, y_train, epochs=10)
+```
 
-GitHub Copilot
 In this example, the model is trained for 10 epochs using the Adam optimizer and mean squared error loss. The accuracy of the model is also tracked.
 
-tf.GradientTape()
-tf.GradientTape() is a lower-level method that provides more control over the training process. It allows you to manually compute the gradients of the loss with respect to the model's parameters, which you can then use to update the model's weights.
+## `tf.GradientTape()`
+`tf.GradientTape()` is a lower-level method that provides more control over the training process. It allows you to manually compute the gradients of the loss with respect to the model's parameters, which you can then use to update the model's weights.
 
 Here's an example:
 ```
