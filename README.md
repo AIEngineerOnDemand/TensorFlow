@@ -377,7 +377,7 @@ def model_builder(hp):
 
   return model
 
-  ````
+  ```
 
   In this function:
 
@@ -387,3 +387,54 @@ The learning rate for the Adam optimizer is also a hyperparameter, which is set 
 The model is compiled with the Adam optimizer, the SparseCategoricalCrossentropy loss, and accuracy as the metric.
 The compiled model is returned.
 
+In the provided function, `hp` is an instance of `HyperParameters` class from Keras Tuner. It's used to define the search space for hyperparameters. 
+
+The `HyperParameters` class provides methods to specify the type and range of values for each hyperparameter of the model. These methods include:
+
+- `hp.Int(name, min_value, max_value, step)`: This method is used to define an integer hyperparameter. It takes the name of the hyperparameter, the minimum and maximum values, and the step size for the search.
+
+- `hp.Choice(name, values)`: This method is used to define a categorical hyperparameter. It takes the name of the hyperparameter and a list of its possible values.
+
+In the provided code:
+
+- `hp_units = hp.Int('units', min_value=32, max_value=512, step=32)` is defining an integer hyperparameter named 'units' with a range from 32 to 512 and a step size of 32. This hyperparameter represents the number of units in the first Dense layer of the model.
+
+- `hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4])` is defining a categorical hyperparameter named 'learning_rate' with possible values of 0.01, 0.001, and 0.0001. This hyperparameter represents the learning rate for the Adam optimizer in the model.
+
+
+The `HyperParameters` class in Keras Tuner provides a way to define the search space for hyperparameters. It includes methods for different types of hyperparameters, such as integer, float, and categorical. Here are some examples:
+
+### Integer Hyperparameters
+
+You can define an integer hyperparameter using the `Int` method. For example, if you want to tune the number of units in a dense layer, you can define a hyperparameter like this:
+
+```python
+hp_units = hp.Int('units', min_value=32, max_value=512, step=32)
+model.add(keras.layers.Dense(units=hp_units, activation='relu'))
+```
+
+In this example, 'units' is the name of the hyperparameter, and it can take on any integer value from 32 to 512, in steps of 32.
+
+### Float Hyperparameters
+You can define a float hyperparameter using the Float method. For example, if you want to tune the dropout rate in a dropout layer, you can define a hyperparameter like this:
+
+```python
+hp_dropout = hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1)
+model.add(keras.layers.Dropout(rate=hp_dropout))
+```
+
+
+In this example, 'dropout' is the name of the hyperparameter, and it can take on any float value from 0.0 to 0.5, in steps of 0.1.
+
+## Categorical Hyperparameters
+You can define a categorical hyperparameter using the Choice method. For example, if you want to tune the activation function of a dense layer, you can define a hyperparameter like this:
+
+```python
+hp_activation = hp.Choice('activation', values=['relu', 'tanh', 'sigmoid'])
+model.add(keras.layers.Dense(units=64, activation=hp_activation))
+```
+
+
+In this example, 'activation' is the name of the hyperparameter, and it can take on any value from the list ['relu', 'tanh', 'sigmoid'].
+
+In summary, the HyperParameters class provides a flexible way to define the search space for hyperparameters when tuning a model with Keras Tuner. 
