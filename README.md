@@ -213,5 +213,177 @@ This decorator tells TensorFlow to compile the function using TensorFlow's graph
 
 
 
+## Training Models with the `tf.estimator` API
 
+The `tf.estimator` API is a high-level TensorFlow API that greatly simplifies machine learning programming. It encapsulates training, evaluation, prediction, and export for serving. While `tf.keras` models can be trained directly using their built-in `fit` method, they can also be converted to an `Estimator` object and trained using the `tf.estimator` API.
+
+Here's how you can convert a `tf.keras.Model` to an `Estimator`:
+
+```python
+import tensorflow as tf
+from tensorflow.keras import layers
+
+# Define a Keras model
+model = tf.keras.models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(10,)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1)
+])
+
+model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
+
+# Convert the Keras model to an Estimator
+estimator = tf.keras.estimator.model_to_estimator(model)
+```
+
+In this example, a `tf.keras.Model` is first defined and compiled. Then, it's converted to an `Estimator` using the `tf.keras.estimator.model_to_estimator` function.
+
+estimator = tf.keras.estimator.model_to_estimator(keras_model)
+
+## Understanding `model_to_estimator`
+
+The `model_to_estimator` method is a utility function provided by TensorFlow that converts a `tf.keras.Model` to a `tf.estimator.Estimator`. This allows you to leverage the simplicity and flexibility of Keras for model definition and debugging, while benefiting from the distributed computing capabilities of `tf.estimator`.
+
+Here's a basic usage example:
+
+```python
+keras_model = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(64, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(1)
+])
+keras_model.compile(optimizer='adam', loss='mse')
+
+estimator = tf.keras.estimator.model_to_estimator(keras_model)
+```
+In this example, a Sequencial Keras model is defined and compiled, and then converted to an `Estimator` using `model_to_estimator`.
+
+Useful Estimator Types for Machine Learning Problems
+While model_to_estimator allows you to convert any Keras model to an Estimator, TensorFlow also provides several pre-made Estimators for common machine learning tasks. These include:
+
+- tf.estimator.LinearClassifier: Constructs a linear classification model.
+- tf.estimator.DNNClassifier: Constructs a neural network classification model.
+- tf.estimator.DNNLinearCombinedClassifier: Constructs a neural network and linear combined classification model.
+- tf.estimator.LinearRegressor: Constructs a linear regression model.
+- tf.estimator.DNNRegressor: Constructs a neural network regression model.
+- tf.estimator.DNNLinearCombinedRegressor: Constructs a neural network and linear combined regression model.
+These pre-made Estimators can simplify the process of creating machine learning models, especially for common tasks like classification and regression.
+Once you have an `Estimator`, you can train it using the `train` method:
+
+```python
+# Define the input function
+def input_fn():
+    # Generate training data here...
+    return dataset
+
+# Train the Estimator
+estimator.train(input_fn, steps=1000)
+```
+
+In this example, an input function is defined that returns a `tf.data.Dataset` object. This dataset is used to train the `Estimator`.
+# Evaluate the Estimator
+```python
+eval_result = keras_estimator.evaluate(input_fn=input_fn, steps=10)
+
+print('Eval result: {}'.format(eval_result))
+```
+In summary, `tf.keras.estimator.model_to_estimator` provides a way to convert a `tf.keras.Model` to an `Estimator`, which can then be trained using the `tf.estimator` API.
+
+## Common Class Methods of the `tf.estimator.Estimator`
+
+The `tf.estimator.Estimator` class provides several methods for training, evaluating, and making predictions with a model. Here are some of the most commonly used methods:
+
+### `train`
+
+The `train` method trains a model for a fixed number of steps.
+
+```python
+def input_fn():
+    # Generate training data here...
+    return dataset
+
+estimator.train(input_fn, steps=1000)
+```
+In this example, the train method is used to train the Estimator for 1000 steps.
+
+### `evaluate`
+
+
+The evaluate method evaluates the model's performance.
+```python
+def input_fn():
+    # Generate test data here...
+    return dataset
+
+eval_result = estimator.evaluate(input_fn=input_fn, steps=10)
+print('Eval result: {}'.format(eval_result))
+```
+In this example, the evaluate method is used to evaluate the Estimator on some test data.
+
+### `predict`
+The predict method makes predictions for a batch of instances.
+```python
+def input_fn():
+    # Generate prediction data here...
+    return dataset
+
+predictions = list(estimator.predict(input_fn))
+```
+In this example, the predict method is used to make predictions for a batch of instances.
+
+### `export_saved_model`
+The export_saved_model method exports the model to the SavedModel format.
+```python
+estimator.export_saved_model('export', serving_input_receiver_fn)
+```
+In this example, the export_saved_model method is used to export the Estimator to the SavedModel format, which can be used for serving.
+
+In summary, the tf.estimator.Estimator class provides several methods for training, evaluating, making predictions with, and exporting a model. 
+
+
+
+## Defining a Hypermodel for Hyperparameter Tuning
+
+When setting up a model for hyperparameter tuning, you not only define the model architecture, but also the hyperparameter search space. The model you set up for hyperparameter tuning is called a hypermodel.
+
+There are two main ways to define a hypermodel:
+
+1. Using a model builder function.
+2. Subclassing the `HyperModel` class of the Keras Tuner API.
+
+In addition, the Keras Tuner provides two pre-defined `HyperModel` classes - `HyperXception` and `HyperResNet` for computer vision applications.
+
+In the provided code, a model builder function is used to define an image classification model. The model builder function returns a compiled model and uses hyperparameters defined inline to hypertune the model.
+
+Here's a breakdown of the `model_builder` function:
+
+```python
+def model_builder(hp):
+  model = keras.Sequential()
+  model.add(keras.layers.Flatten(input_shape=(28, 28)))
+
+  # Tune the number of units in the first Dense layer
+  # Choose an optimal value between 32-512
+  hp_units = hp.Int('units', min_value=32, max_value=512, step=32)
+  model.add(keras.layers.Dense(units=hp_units, activation='relu'))
+  model.add(keras.layers.Dense(10))
+
+  # Tune the learning rate for the optimizer
+  # Choose an optimal value from 0.01, 0.001, or 0.0001
+  hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4])
+
+  model.compile(optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate),
+                loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                metrics=['accuracy'])
+
+  return model
+
+  ````
+
+  In this function:
+
+A Sequential model is created with a Flatten layer as the input layer, which flattens the input data to a 1D array.
+The number of units in the first Dense layer is a hyperparameter, which is set to an integer value between 32 and 512.
+The learning rate for the Adam optimizer is also a hyperparameter, which is set to one of three possible values: 0.01, 0.001, or 0.0001.
+The model is compiled with the Adam optimizer, the SparseCategoricalCrossentropy loss, and accuracy as the metric.
+The compiled model is returned.
 
