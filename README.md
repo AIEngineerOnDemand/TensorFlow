@@ -27,3 +27,15 @@ class MyModel(Model):
 
 # Create an instance of the model
 model = MyModel()
+
+## Explanation of TensorFlow Training Step
+
+The `train_step` function is a single step in the training of a TensorFlow model. Here's what each part does:
+
+
+```python
+@tf.function
+``` This decorator tells TensorFlow to compile the function using TensorFlow's graph mode, which can provide significant speedups.
+
+
+
