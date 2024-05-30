@@ -438,3 +438,37 @@ model.add(keras.layers.Dense(units=64, activation=hp_activation))
 In this example, 'activation' is the name of the hyperparameter, and it can take on any value from the list ['relu', 'tanh', 'sigmoid'].
 
 In summary, the HyperParameters class provides a flexible way to define the search space for hyperparameters when tuning a model with Keras Tuner. 
+
+The `Hyperband` tuner is an implementation of the Hyperband algorithm for hyperparameter optimization. It's provided by the Keras Tuner library. The Hyperband algorithm is an extension of the random search that uses early-stopping to speed up the hyperparameter tuning process.
+
+Here's a breakdown of the `Hyperband` tuner initialization:
+
+```python
+tuner = kt.Hyperband(model_builder,
+                     objective='val_accuracy',
+                     max_epochs=10,
+                     factor=3,
+                     directory='my_dir',
+                     project_name='intro_to_kt')
+                     
+```
+In this code:
+
+- model_builder is the function that builds and returns the model to be trained and it should take hyperparameters (from the HyperParameters class) as an argument.
+
+- objective is the metric that the tuner will optimize. In this case, it's 'val_accuracy', which is the validation accuracy. The tuner will aim to find the model configuration that gives the highest validation accuracy.
+
+- max_epochs is the maximum number of epochs to train one model. It's used to determine the number of models (or "resources") to allocate in each round of the Hyperband algorithm.
+
+- factor is the reduction factor for the number of epochs and number of models for each bracket in the Hyperband algorithm.
+
+- directory is the path to the directory where the tuner will save its outputs.
+
+- project_name is the name of the subdirectory under directory where the tuner will save its outputs. If the path directory/project_name exists, the tuner will overwrite the existing outputs there.
+
+After initializing the tuner, you can start the hyperparameter search using the search method of the tune
+```python
+tuner.search(train_images, train_labels, epochs=50, validation_split=0.2)
+```
+In this example, train_images and train_labels are the training data and labels, epochs is the number of epochs to train each model, and validation_split is the fraction of the training data to use as validation data.
+
