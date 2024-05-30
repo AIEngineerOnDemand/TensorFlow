@@ -244,6 +244,9 @@ estimator = tf.keras.estimator.model_to_estimator(keras_model)
 
 The `model_to_estimator` method is a utility function provided by TensorFlow that converts a `tf.keras.Model` to a `tf.estimator.Estimator`. This allows you to leverage the simplicity and flexibility of Keras for model definition and debugging, while benefiting from the distributed computing capabilities of `tf.estimator`.
 
+
+![Estimator Picture](EstimatorPic.png)
+
 Here's a basic usage example:
 
 ```python
