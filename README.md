@@ -466,9 +466,51 @@ In this code:
 
 - project_name is the name of the subdirectory under directory where the tuner will save its outputs. If the path directory/project_name exists, the tuner will overwrite the existing outputs there.
 
-After initializing the tuner, you can start the hyperparameter search using the search method of the tune
-```python
-tuner.search(train_images, train_labels, epochs=50, validation_split=0.2)
-```
-In this example, train_images and train_labels are the training data and labels, epochs is the number of epochs to train each model, and validation_split is the fraction of the training data to use as validation data.
+After initializing the tuner, you can start the hyperparameter search using the `search` method of the tuner:
 
+```python
+stop_early = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5)
+
+tuner.search(train_images, train_labels, epochs=50, validation_split=0.2, callbacks=[stop_early])
+```
+In this example, train_images and train_labels are the training data and labels, epochs is the number of epochs to train each model, validation_split is the fraction of the training data to use as validation data, and callbacks is a list of callbacks to apply during training. Here, we use the EarlyStopping callback from TensorFlow, which stops training when a monitored metric has stopped improving. In this case, we monitor 'val_loss' and stop training if it doesn't improve for 5 epochs.
+
+After the hyperparameter search, you can retrieve the best hyperparameters and build a model with them:
+
+```python
+# Get the optimal hyperparameters
+best_hps=tuner.get_best_hyperparameters(num_trials=1)[0]
+
+print(f"""
+The hyperparameter search is complete. The optimal number of units in the first densely-connected
+layer is {best_hps.get('units')} and the optimal learning rate for the optimizer
+is {best_hps.get('learning_rate')}.
+""")
+```
+In this code, tuner.get_best_hyperparameters(num_trials=1)[0] retrieves the best hyperparameters from the search. The get method is used to access the value of each hyperparameter.
+
+Next, you build a model with the best hyperparameters and train it:
+# Build the model with the optimal hyperparameters and train it on the data
+```python
+model = tuner.hypermodel.build(best_hps)
+history = model.fit(img_train, label_train, epochs=50, validation_split=0.2)
+```
+You can then determine the epoch at which the validation accuracy was highest during the training of this model:
+```python
+val_acc_per_epoch = history.history['val_accuracy']
+best_epoch = val_acc_per_epoch.index(max(val_acc_per_epoch)) + 1
+print('Best epoch: %d' % (best_epoch,))
+```
+After finding the best epoch, you build a new hypermodel with the best hyperparameters and train it for the optimal number of epochs:
+```python
+val_acc_per_epoch = history.history['val_accuracy']
+best_epoch = val_acc_per_epoch.index(max(val_acc_per_epoch)) + 1
+print('Best epoch: %d' % (best_epoch,))
+```
+Finally, you evaluate the hypermodel on the test data:
+
+```python
+eval_result = hypermodel.evaluate(img_test, label_test)
+print("[test loss, test accuracy]:", eval_result)
+```
+This will print the test loss and test accuracy of the hypermodel. 
