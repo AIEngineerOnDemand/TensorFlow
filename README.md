@@ -6,7 +6,7 @@
 
 In TensorFlow, there are two common ways to define models: using the `Sequential` API, and using the Model subclassing. Here's a brief explanation of the differences:
 
-### `Sequential` API
+### Sequential API
 
 The `Sequential` API is a way of creating deep learning models where each layer has exactly one input tensor and one output tensor. It's a simple stack of layers that can't represent arbitrary models.
 
@@ -24,7 +24,62 @@ model = Sequential([
 
 In this example, the model is a simple stack of three dense layers. It's easy to understand and use, but it's not suitable for models with shared layers, multiple inputs, or multiple outputs.
 
-## Model Subclassing with TensorFlow's Keras Model Class
+### Functional API with TensorFlow's Keras
+The Functional API is another way to create models that are more flexible than the `Sequential` API. It can handle models with non-linear topology, shared layers, and even multiple inputs or outputs. The main idea is that a deep learning model is usually a directed acyclic graph (DAG) of layers. So, you can build any kind of graph of layers using the functional API.
+
+Here's an example of a model built with the Functional API:
+
+```python
+from tensorflow import keras
+from tensorflow.keras import layers
+
+def make_model(input_shape, num_classes):
+  inputs = keras.Input(shape=input_shape)
+
+  # Entry block
+  x = layers.Rescaling(1.0 / 255)(inputs)
+  x = layers.Conv2D(128, 3, strides=2, padding="same")(x)
+  x = layers.BatchNormalization()(x)
+  x = layers.Activation("relu")(x)
+
+  previous_block_activation = x  # Set aside residual
+
+  for size in [256, 512, 728]:
+    x = layers.Activation("relu")(x)
+    x = layers.SeparableConv2D(size, 3, padding="same")(x)
+    x = layers.BatchNormalization()(x)
+
+    x = layers.Activation("relu")(x)
+    x = layers.SeparableConv2D(size, 3, padding="same")(x)
+    x = layers.BatchNormalization()(x)
+
+    x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
+
+    # Project residual
+    residual = layers.Conv2D(size, 1, strides=2, padding="same")(
+      previous_block_activation
+    )
+    x = layers.add([x, residual])  # Add back residual
+    previous_block_activation = x  # Set aside next residual
+
+  x = layers.SeparableConv2D(1024, 3, padding="same")(x)
+  x = layers.BatchNormalization()(x)
+  x = layers.Activation("relu")(x)
+
+  x = layers.GlobalAveragePooling2D()(x)
+  if num_classes == 2:
+    units = 1
+  else:
+    units = num_classes
+
+  x = layers.Dropout(0.25)(x)
+  # We specify activation=None so as to return logits
+  outputs = layers.Dense(units, activation=None)(x)
+  return keras.Model(inputs, outputs)
+```
+In this example, the model is built by starting from a Input node that is passed to a series of layers. The Model is instantiated by specifying the inputs and outputs in the graph of layers. This model has a complex architecture with residual connections and shared layers
+
+### Model Subclassing with TensorFlow's Keras Model Class
 Model subclassing is a way of creating models that gives more flexibility, at the cost of greater complexity. It involves defining a new class that inherits from the Model class, and overriding the __init__ and call methods.
 The `Model` class in `tensorflow.keras` is a high-level API that is used for defining a neural network model. It groups layers into an object with training and inference features.
 Here's an example:
