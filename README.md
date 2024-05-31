@@ -80,7 +80,7 @@ def make_model(input_shape, num_classes):
 In this example, the model is built by starting from a Input node that is passed to a series of layers. The Model is instantiated by specifying the inputs and outputs in the graph of layers. This model has a complex architecture with residual connections and shared layers
 
 ### Model Subclassing with TensorFlow's Keras Model Class
-Model subclassing is a way of creating models that gives more flexibility, at the cost of greater complexity. It involves defining a new class that inherits from the Model class, and overriding the __init__ and call methods.
+Model subclassing is a way of creating models that gives more flexibility, with the funcional API, at the cost of greater complexity. It involves defining a new class that inherits from the Model class, and overriding the __init__ and call methods.
 The `Model` class in `tensorflow.keras` is a high-level API that is used for defining a neural network model. It groups layers into an object with training and inference features.
 Here's an example:
 
