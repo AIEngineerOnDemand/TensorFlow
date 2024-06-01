@@ -1,6 +1,31 @@
-# Reference code for Tensorflow  
-
-
+## Table of Content
+- [Reference code for Tensorflow](#reference-code-for-tensorflow)
+  - [Understanding Different Ways to Define Models in TensorFlow](#understanding-different-ways-to-define-models-in-tensorflow)
+    - [Sequential API](#sequential-api)
+    - [Functional API with TensorFlow's Keras](#functional-api-with-tensorflows-keras)
+    - [Model Subclassing with TensorFlow's Keras Model Class](#model-subclassing-with-tensorflows-keras-model-class)
+  - [Difference Between `model.fit()` and `tf.GradientTape()` for Training](#difference-between-modelfit-and-tfgradienttape-for-training)
+  - [`model.fit()`](#modelfit)
+  - [`tf.GradientTape()`](#tfgradienttape)
+  - [Understanding TensorFlow Metrics](#understanding-tensorflow-metrics)
+    - [`tf.keras.metrics.Mean`](#tfkerasmetricsmean)
+    - [`tf.keras.metrics.SparseCategoricalAccuracy`](#tfkerasmetricssparsecategoricalaccuracy)
+  - [Explanation of TensorFlow Training Step](#explanation-of-tensorflow-training-step)
+  - [Training Models with the `tf.estimator` API](#training-models-with-the-tfestimator-api)
+  - [Understanding `model_to_estimator`](#understanding-model_to_estimator)
+- [Evaluate the Estimator](#evaluate-the-estimator)
+  - [Common Class Methods of the `tf.estimator.Estimator`](#common-class-methods-of-the-tfestimatorestimator)
+    - [`train`](#train)
+    - [`evaluate`](#evaluate)
+    - [`predict`](#predict)
+    - [`export_saved_model`](#export_saved_model)
+  - [Defining a Hypermodel for Hyperparameter Tuning](#defining-a-hypermodel-for-hyperparameter-tuning)
+    - [Integer Hyperparameters](#integer-hyperparameters)
+    - [Float Hyperparameters](#float-hyperparameters)
+  - [Categorical Hyperparameters](#categorical-hyperparameters)
+- [Build the model with the optimal hyperparameters and train it on the data](#build-the-model-with-the-optimal-hyperparameters-and-train-it-on-the-data)
+  
+# Reference code for Tensorflow
 
 ## Understanding Different Ways to Define Models in TensorFlow
 
