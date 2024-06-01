@@ -1,17 +1,16 @@
 ## Table of Content
-- [Reference code for Tensorflow](#reference-code-for-tensorflow)
-  - [Understanding Different Ways to Define Models in TensorFlow](#understanding-different-ways-to-define-models-in-tensorflow)
+- [Understanding Different Ways to Define Models in TensorFlow](#understanding-different-ways-to-define-models-in-tensorflow)
     - [Sequential API](#sequential-api)
     - [Functional API with TensorFlow's Keras](#functional-api-with-tensorflows-keras)
     - [Model Subclassing with TensorFlow's Keras Model Class](#model-subclassing-with-tensorflows-keras-model-class)
-  - [Difference Between `model.fit()` and `tf.GradientTape()` for Training](#difference-between-modelfit-and-tfgradienttape-for-training)
-  - [`model.fit()`](#modelfit)
-  - [`tf.GradientTape()`](#tfgradienttape)
-  - [Understanding TensorFlow Metrics](#understanding-tensorflow-metrics)
+- [Difference Between `model.fit()` and `tf.GradientTape()` for Training](#difference-between-modelfit-and-tfgradienttape-for-training)
+    - [`model.fit()`](#modelfit)
+    - [`tf.GradientTape()`](#tfgradienttape)
+- [TensorFlow Metrics](#tensorflow-metrics)
     - [`tf.keras.metrics.Mean`](#tfkerasmetricsmean)
     - [`tf.keras.metrics.SparseCategoricalAccuracy`](#tfkerasmetricssparsecategoricalaccuracy)
-  - [Explanation of TensorFlow Training Step](#explanation-of-tensorflow-training-step)
-  - [Training Models with the `tf.estimator` API](#training-models-with-the-tfestimator-api)
+- [Explanation of TensorFlow Training Step](#explanation-of-tensorflow-training-step)
+- [Training Models with the `tf.estimator` API](#training-models-with-the-tfestimator-api)
   - [Understanding `model_to_estimator`](#understanding-model_to_estimator)
 - [Evaluate the Estimator](#evaluate-the-estimator)
   - [Common Class Methods of the `tf.estimator.Estimator`](#common-class-methods-of-the-tfestimatorestimator)
@@ -19,15 +18,13 @@
     - [`evaluate`](#evaluate)
     - [`predict`](#predict)
     - [`export_saved_model`](#export_saved_model)
-  - [Defining a Hypermodel for Hyperparameter Tuning](#defining-a-hypermodel-for-hyperparameter-tuning)
+- [Defining a Hypermodel for Hyperparameter Tuning](#defining-a-hypermodel-for-hyperparameter-tuning)
     - [Integer Hyperparameters](#integer-hyperparameters)
     - [Float Hyperparameters](#float-hyperparameters)
   - [Categorical Hyperparameters](#categorical-hyperparameters)
 - [Build the model with the optimal hyperparameters and train it on the data](#build-the-model-with-the-optimal-hyperparameters-and-train-it-on-the-data)
-  
-# Reference code for Tensorflow
 
-## Understanding Different Ways to Define Models in TensorFlow
+# Understanding Different Ways to Define Models in TensorFlow
 
 In TensorFlow, there are two common ways to define models: using the `Sequential` API, and using the Model subclassing. Here's a brief explanation of the differences:
 
@@ -149,11 +146,11 @@ class MyModel(Model):
 # Create an instance of the model
 model = MyModel()
 ```
-## Difference Between `model.fit()` and `tf.GradientTape()` for Training
+# Difference Between `model.fit()` and `tf.GradientTape()` for Training
 
 In TensorFlow, there are multiple ways to train a model. Two common methods are using the `fit` method of a compiled model, and using a `tf.GradientTape` to manually compute gradients. Here's a brief explanation of the differences:
 
-## `model.fit()`
+### `model.fit()`
 
 `model.fit()` is a high-level method provided by Keras (which is included in TensorFlow). It abstracts away many of the details of training a model, making it very easy to use. 
 
@@ -176,7 +173,7 @@ model.fit(x_train, y_train, epochs=10)
 
 In this example, the model is trained for 10 epochs using the Adam optimizer and mean squared error loss. The accuracy of the model is also tracked.
 
-## `tf.GradientTape()`
+### `tf.GradientTape()`
 `tf.GradientTape()` is a lower-level method that provides more control over the training process. It allows you to manually compute the gradients of the loss with respect to the model's parameters, which you can then use to update the model's weights.
 `tf.GradientTape()` is a context manager provided by TensorFlow for automatic differentiation - the process of computing gradients of a computation with respect to some inputs, usually `tf.Variable`s. 
 
@@ -202,7 +199,7 @@ In this example, the model's predictions are computed within the context of a tf
 In summary, model.fit() is a high-level, easy-to-use method for training a model, while tf.GradientTape() provides more control and is useful for more complex training loops. 
 
 
-## Understanding TensorFlow Metrics
+# TensorFlow Metrics
 
 In TensorFlow, metrics are instances of the `tf.keras.metrics.Metric` class, which you can use to track the progress of your training and testing loops. Here's a brief explanation of the metrics used in this code:
 
@@ -235,7 +232,7 @@ In this example, `train_accuracy` and `test_accuracy` are metrics that compute t
 In summary, `tf.keras.metrics.Mean` and `tf.keras.metrics.SparseCategoricalAccuracy` are used to track the progress of the training and testing loops.
 
 
-## Explanation of TensorFlow Training Step
+# Explanation of TensorFlow Training Step
 
 The `train_step` function is a single step in the training of a TensorFlow model. Here's what each part does:
 
@@ -293,7 +290,7 @@ This decorator tells TensorFlow to compile the function using TensorFlow's graph
 
 
 
-## Training Models with the `tf.estimator` API
+# Training Models with the `tf.estimator` API
 
 The `tf.estimator` API is a high-level TensorFlow API that greatly simplifies machine learning programming. It encapsulates training, evaluation, prediction, and export for serving. While `tf.keras` models can be trained directly using their built-in `fit` method, they can also be converted to an `Estimator` object and trained using the `tf.estimator` API.
 
@@ -424,7 +421,7 @@ In summary, the tf.estimator.Estimator class provides several methods for traini
 
 
 
-## Defining a Hypermodel for Hyperparameter Tuning
+# Defining a Hypermodel for Hyperparameter Tuning
 
 When setting up a model for hyperparameter tuning, you not only define the model architecture, but also the hyperparameter search space. The model you set up for hyperparameter tuning is called a hypermodel.
 
