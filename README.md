@@ -23,6 +23,7 @@
     - [Float Hyperparameters](#float-hyperparameters)
   - [Categorical Hyperparameters](#categorical-hyperparameters)
 - [Build the model with the optimal hyperparameters and train it on the data](#build-the-model-with-the-optimal-hyperparameters-and-train-it-on-the-data)
+  - [Running TensorFlow on TPU](#running-tensorflow-on-tpu)
 
 # Understanding Different Ways to Define Models in TensorFlow
 
@@ -596,7 +597,25 @@ print("[test loss, test accuracy]:", eval_result)
 This will print the test loss and test accuracy of the hypermodel.. 
 
 
+## Running TensorFlow on TPU
 
+Tensor Processing Units (TPUs) are Google's custom-developed application-specific integrated circuits (ASICs) used to accelerate machine learning workloads. They are designed to speed up computations done with TensorFlow.
 
+To run TensorFlow on TPU, you need to use the `tf.distribute.TPUStrategy` API. Here's an example of how to do this:
+
+```python
+try:
+    # Connect to the TPU
+    tpu = tf.distribute.cluster_resolver.TPUClusterResolver.connect()
+    print("Device:", tpu.master())
+
+    # Create a distribution strategy
+    strategy = tf.distribute.TPUStrategy(tpu)
+except:
+    # If no TPU is found, fall back to the default strategy
+    strategy = tf.distribute.get_strategy()
+
+print("Number of replicas:", strategy.num_replicas_in_sync)
+```
 
 
